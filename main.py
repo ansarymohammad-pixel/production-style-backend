@@ -1,6 +1,9 @@
+import os
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pandas as pd
+import uvicorn
 
 from engine import analyze
 
@@ -18,27 +21,27 @@ def get_demo_history() -> pd.DataFrame:
             (
                 "2026-02-02 09:00:00",
                 "source_A",
-                "Energy policy discussion and regional oil market reaction."
+                "Energy policy discussion and regional oil market reaction.",
             ),
             (
                 "2026-02-02 10:00:00",
                 "source_B",
-                "Supreme Court hears arguments about tariff authority and trade powers."
+                "Supreme Court hears arguments about tariff authority and trade powers.",
             ),
             (
                 "2026-02-02 11:00:00",
                 "source_C",
-                "Iran warns against military escalation as diplomacy continues."
+                "Iran warns against military escalation as diplomacy continues.",
             ),
             (
                 "2026-02-02 12:00:00",
                 "source_D",
-                "Taiwan Strait tensions raise shipping and semiconductor concerns."
+                "Taiwan Strait tensions raise shipping and semiconductor concerns.",
             ),
             (
                 "2026-02-02 13:00:00",
                 "source_E",
-                "Central bank signals new rate path as inflation outlook shifts."
+                "Central bank signals new rate path as inflation outlook shifts.",
             ),
         ],
         columns=["time", "source", "text"],
@@ -77,7 +80,6 @@ def analyze_headline(payload: AnalyzeHeadlineRequest):
             coord_threshold=0.90,
         )
         return out
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -101,6 +103,10 @@ def analyze_text(payload: AnalyzeTextRequest):
             coord_threshold=payload.coord_threshold,
         )
         return out
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
